@@ -6,7 +6,7 @@ ngAnnotate = require 'gulp-ng-annotate'
 coffee = require 'gulp-coffee'
 concat = require 'gulp-concat'
 uglify = require 'gulp-uglify'
-minifyCSS = require 'gulp-minify-css'
+minifyCSS = require 'gulp-cssnano'
 htmlReplace = require 'gulp-html-replace'
 sourcemaps = require 'gulp-sourcemaps'
 less       = require 'gulp-less'
@@ -29,14 +29,10 @@ path =
       'bower_components/angular-resource/angular-resource.min.js'
       'bower_components/angular-ui-router/release/angular-ui-router.min.js'
       'bower_components/angular-sanitize/angular-sanitize.min.js'
-      'bower_components/admin-lte/dist/js/app.min.js'
     ]
     css: [
       "bower_components/bootstrap/dist/css/bootstrap.min.css"
-      "bower_components/bootstrap-select/dist/css/bootstrap-select.min.css"
       "bower_components/font-awesome/css/font-awesome.min.css"
-      "bower_components/admin-lte/dist/css/AdminLTE.min.css"
-      "bower_components/admin-lte/dist/css/skins/_all-skins.min.css"
       "css/main.css"
     ]
 
@@ -87,7 +83,7 @@ gulp.task 'b-vendor', () ->
 
 gulp.task 'b-css', () ->
   gulp.src path.bower.css
-    .pipe minifyCSS keepBreaks:true
+    .pipe minifyCSS()
     .pipe concat 'style.css'
     .pipe gulp.dest './dist/css/'
 
