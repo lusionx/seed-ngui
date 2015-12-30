@@ -1,40 +1,47 @@
-gulp = require 'gulp'
-gutil = require 'gutil'
-_ = require 'lodash'
+gulp        = require 'gulp'
+gutil       = require 'gutil'
+_           = require 'lodash'
 
-ngAnnotate = require 'gulp-ng-annotate'
-coffee = require 'gulp-coffee'
-concat = require 'gulp-concat'
-uglify = require 'gulp-uglify'
-minifyCSS = require 'gulp-cssnano'
+ngAnnotate  = require 'gulp-ng-annotate'
+coffee      = require 'gulp-coffee'
+concat      = require 'gulp-concat'
+uglify      = require 'gulp-uglify'
+minifyCSS   = require 'gulp-cssnano'
 htmlReplace = require 'gulp-html-replace'
-sourcemaps = require 'gulp-sourcemaps'
-less       = require 'gulp-less'
+sourcemaps  = require 'gulp-sourcemaps'
+less        = require 'gulp-less'
+
+
+getSrc = (re, str) ->
+  lns = str.split '\n'
+  _.map lns, (l) ->
+    if m = re.exec l
+      return m[1]
+    null
+
 
 path =
   coffee:
     src: ['app/scripts/app.coffee', './app/scripts/*/*.coffee']
   less:
     src: ['app/less/*.less']
-  bower:
-    src: [
-      'bower_components/lodash/lodash.min.js'
-      'bower_components/moment/min/moment.min.js'
-      'bower_components/async/dist/async.min.js'
-      'bower_components/jquery/dist/jquery.min.js'
-      'bower_components/bootstrap/dist/js/bootstrap.min.js'
-      'bower_components/bootstrap-select/dist/js/bootstrap-select.min.js'
-      'bower_components/angular/angular.min.js'
-      'bower_components/angular-filter/dist/angular-filter.min.js'
-      'bower_components/angular-resource/angular-resource.min.js'
-      'bower_components/angular-ui-router/release/angular-ui-router.min.js'
-      'bower_components/angular-sanitize/angular-sanitize.min.js'
-    ]
+  bower: # cp from index.html
+    src: getSrc /src="(.+)"/, """
+<script src="bower_components/lodash/lodash.min.js"></script>
+<script src="bower_components/async/dist/async.min.js"></script>
+<script src="bower_components/moment/min/moment.min.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/amazeui/dist/js/amazeui.min.js"></script>
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+<script src="bower_components/angular-resource/angular-resource.min.js"></script>
+<script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+"""
     css: [
-      "bower_components/bootstrap/dist/css/bootstrap.min.css"
-      "bower_components/font-awesome/css/font-awesome.min.css"
-      "css/main.css"
+      "bower_components/amazeui/dist/css/amazeui.min.css"
     ]
+
 
 # develop task
 
@@ -74,30 +81,31 @@ gulp.task 'b-app', () ->
     .pipe ngAnnotate()
     .pipe concat 'app.js'
     .pipe uglify {}
-    .pipe gulp.dest './dist/js/'
+    .pipe gulp.dest 'dist/js/'
 
 gulp.task 'b-vendor', () ->
   gulp.src path.bower.src
     .pipe concat 'vendor.js'
-    .pipe gulp.dest './dist/js/'
+    .pipe gulp.dest 'dist/js/'
 
-gulp.task 'b-css', () ->
-  gulp.src path.bower.css
+gulp.task 'b-css-tmp', ['d-css'], () ->
+  gulp.src 'app/css/*.css'
     .pipe minifyCSS()
     .pipe concat 'style.css'
-    .pipe gulp.dest './dist/css/'
+    .pipe gulp.dest 'tmp/css/'
+
+gulp.task 'b-css', ['b-css-tmp'], () ->
+  gulp.src path.bower.css.concat ['tmp/css/*']
+    .pipe concat 'style.css'
+    .pipe gulp.dest 'dist/css/'
 
 gulp.task 'b-copy', () ->
-  gulp.src 'bower_components/bootstrap/dist/fonts/*'
+  gulp.src 'bower_components/amazeui/fonts/*'
     .pipe gulp.dest './dist/fonts/'
-  gulp.src 'bower_components/font-awesome/fonts/*'
-    .pipe gulp.dest './dist/fonts/'
-
   gulp.src 'app/img/*'
     .pipe gulp.dest './dist/img/'
-
   gulp.src 'app/views/**/*.html'
-    .pipe gulp.dest './dist/views/'
+    .pipe gulp.dest 'dist/views/'
 
 gulp.task 'b-index', () ->
   opt =
@@ -113,17 +121,17 @@ gulp.task 'b-index', () ->
     jsVendor: "js/vendor.js?#{i}"
     jsApp: "js/app.js?#{i}"
 
-  gulp.src './app/index.html'
+  gulp.src 'app/index.html'
     .pipe htmlReplace varDic
     .pipe gulp.dest './dist/'
 
 gulp.task 't', ['d-app']
 
-gulp.task 'default', ['d-app', 'w-coffee', 'd-css', 'w-less'], () ->
+gulp.task 'default', ['d-app', 'w-coffee', 'd-css', 'w-less']
 
 gulp.task 'd', ['d-app', 'd-css']
 
-gulp.task 'build', ['b-app', 'b-vendor', 'b-css', 'b-index', 'b-copy'], () ->
-
-gulp.task 'b', ['build']
+build = ['b-app', 'b-vendor', 'b-css', 'b-index', 'b-copy']
+gulp.task 'build', build
+gulp.task 'b', build
 
