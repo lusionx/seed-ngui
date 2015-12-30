@@ -9,7 +9,7 @@ app.config ($httpProvider) ->
     response: (res) ->
       res
 
-app.config ($stateProvider, $urlRouterProvider, queryObj) ->
+app.config ($stateProvider, $urlRouterProvider) ->
   home = '/app/home'
   $urlRouterProvider.when '', home
   $urlRouterProvider.when '/', home
@@ -22,4 +22,4 @@ app.config ($stateProvider, $urlRouterProvider, queryObj) ->
   $stateProvider.state 'app.home',
     url: '/home'
     controller: 'appHomeCtrl'
-    templateUrl: 'views/app/Home.html'
+    templateUrl: 'views/app/home.html'

@@ -62,7 +62,7 @@ gulp.task 'w-less', () ->
 gulp.task 'd-css', () ->
   gulp.src path.less.src
     .pipe less()
-    .pipe concat 'main.css'
+    .pipe concat 'app.css'
     .pipe gulp.dest 'app/css/'
 
 
