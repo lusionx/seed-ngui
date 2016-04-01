@@ -23,7 +23,7 @@ getSrc = (re, str) ->
 
 path =
   coffee:
-    src: ['app/scripts/app.coffee', './app/scripts/*/*.coffee']
+    src: ['app/scripts/app.coffee', 'app/scripts/*/*.coffee']
   pack: ['impack.js']
   less:
     src: ['app/less/*.less']
