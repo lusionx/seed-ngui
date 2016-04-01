@@ -10,6 +10,7 @@ minifyCSS   = require 'gulp-cssnano'
 htmlReplace = require 'gulp-html-replace'
 sourcemaps  = require 'gulp-sourcemaps'
 less        = require 'gulp-less'
+browserify  = require 'gulp-browserify'
 
 
 getSrc = (re, str) ->
@@ -23,13 +24,11 @@ getSrc = (re, str) ->
 path =
   coffee:
     src: ['app/scripts/app.coffee', './app/scripts/*/*.coffee']
+  pack: ['impack.js']
   less:
     src: ['app/less/*.less']
   bower: # cp from index.html
     src: getSrc /src="(.+)"/, """
-<script src="bower_components/lodash/lodash.min.js"></script>
-<script src="bower_components/async/dist/async.min.js"></script>
-<script src="bower_components/moment/min/moment.min.js"></script>
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/amazeui/dist/js/amazeui.min.js"></script>
 <script src="bower_components/angular/angular.min.js"></script>
@@ -57,9 +56,6 @@ gulp.task 'd-app', () ->
     .pipe concat 'app.js'
     .pipe sourcemaps.write './'
     .pipe gulp.dest "app/js/"
-  gulp.src 'app/scripts/force.coffee'
-    .pipe coffee().on('error', gutil.log)
-    .pipe gulp.dest "app/js/"
 
 gulp.task 'w-less', () ->
   ww = gulp.watch path.less.src, ['d-css']
@@ -72,8 +68,24 @@ gulp.task 'd-css', () ->
     .pipe concat 'app.css'
     .pipe gulp.dest 'app/css/'
 
+# 打包三方package, 防污染window
+gulp.task 'd-pack', () ->
+  opt =
+    insertGlobals: no
+    debug: no
+  gulp.src path.pack
+    .pipe browserify opt
+    .pipe gulp.dest 'app/js/'
 
 # build task
+gulp.task 'b-pack', () ->
+  opt =
+    insertGlobals: no
+    debug: no
+  gulp.src path.pack
+    .pipe browserify opt
+    .pipe uglify {}
+    .pipe gulp.dest 'dist/js/'
 
 gulp.task 'b-app', () ->
   gulp.src path.coffee.src
@@ -123,15 +135,12 @@ gulp.task 'b-index', () ->
 
   gulp.src 'app/index.html'
     .pipe htmlReplace varDic
-    .pipe gulp.dest './dist/'
+    .pipe gulp.dest 'dist/'
 
 gulp.task 't', ['d-app']
 
-gulp.task 'default', ['d-app', 'w-coffee', 'd-css', 'w-less']
-
-gulp.task 'd', ['d-app', 'd-css']
-
-build = ['b-app', 'b-vendor', 'b-css', 'b-index', 'b-copy']
+gulp.task 'default', ['d-app', 'w-coffee', 'd-css', 'w-less', 'd-pack']
+gulp.task 'd', ['d-app', 'd-css', 'd-pack']
+build = ['b-app', 'b-vendor', 'b-css', 'b-index', 'b-copy', 'b-pack']
 gulp.task 'build', build
 gulp.task 'b', build
-
