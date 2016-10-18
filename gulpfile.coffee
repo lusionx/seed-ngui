@@ -29,16 +29,15 @@ path =
     src: ['app/less/*.less']
   bower: # cp from index.html
     src: getSrc /src="(.+)"/, """
-<script src="bower_components/jquery/dist/jquery.min.js"></script>
-<script src="bower_components/amazeui/dist/js/amazeui.min.js"></script>
-<script src="bower_components/angular/angular.min.js"></script>
-<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
-<script src="bower_components/angular-resource/angular-resource.min.js"></script>
-<script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
-<script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/amazeui/dist/js/amazeui.min.js"></script>
+<script src="node_modules/angular/angular.min.js"></script>
+<script src="node_modules/angular-resource/angular-resource.min.js"></script>
+<script src="node_modules/angular-filter/dist/angular-filter.min.js"></script>
+<script src="node_modules/angular-ui-router/release/angular-ui-router.min.js"></script>
 """
     css: [
-      "bower_components/amazeui/dist/css/amazeui.min.css"
+      "node_modules/amazeui/dist/css/amazeui.min.css"
     ]
 
 
